@@ -29,6 +29,9 @@
         const energyElement = document.querySelector(".energy");
 
         function updateStatus() {
+            if (petEnergy < 30) {
+                petMood = "😩"; // Уставший питомец
+            }
             statusElement.innerText = "Состояние: " + petMood;
             energyElement.innerText = "Энергия: " + petEnergy;
             localStorage.setItem("petMood", petMood);
@@ -57,9 +60,17 @@
         }
 
         setInterval(() => {
-            petMood = "😢"; // Если долго не ухаживать, питомцу грустно
+            petEnergy = Math.max(petEnergy - 5, 0);
+            if (petEnergy === 0) {
+                petMood = "😭"; // Совсем уставший питомец
+            }
             updateStatus();
         }, 10000);
+
+        setInterval(() => {
+            petMood = "😢"; // Если долго не ухаживать, питомцу грустно
+            updateStatus();
+        }, 15000);
 
         updateStatus(); // Устанавливаем сохраненное состояние при загрузке
     </script>
