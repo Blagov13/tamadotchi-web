@@ -24,6 +24,7 @@
     <button onclick="playWithPet()" id="playButton">Играть</button>
     <button onclick="restPet()" id="restButton">Отдых</button>
     <button onclick="buyFood()" id="buyFoodButton">Купить еду (10 монет)</button>
+    <button onclick="workPet()" id="workButton">Работать (5 монет, -10 энергии)</button>
     <button onclick="revivePet()" id="reviveButton" style="display: none;">Возродить</button>
 
     <script>
@@ -52,7 +53,7 @@
                 reviveButton.style.display = "none";
                 buttons.forEach(button => button.disabled = false);
                 if (petEnergy < 30) {
-                    petMood = "😩"; // Уставший питомец
+                    petMood = "😩";
                 }
             }
             statusElement.innerText = "Состояние: " + petMood;
@@ -117,6 +118,17 @@
             }
         }
 
+        function workPet() {
+            if (!isDead && petEnergy >= 10) {
+                coins += 5;
+                petEnergy -= 10;
+                petMood = "💼";
+                updateStatus();
+            } else {
+                alert("Питомец слишком уставший для работы!");
+            }
+        }
+
         function revivePet() {
             petMood = "😊";
             petEnergy = 100;
@@ -132,7 +144,7 @@
                     petMood = "😭";
                     deathTimer += 1;
                 }
-                if (deathTimer >= 3) { // Если питомец на нуле энергии слишком долго
+                if (deathTimer >= 3) {
                     petMood = "💀";
                     isDead = true;
                     buttons.forEach(button => button.disabled = true);
