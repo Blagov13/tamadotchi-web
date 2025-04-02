@@ -8,7 +8,7 @@
     <style>
         body { font-family: Arial, sans-serif; text-align: center; }
         .pet { font-size: 50px; }
-        .status, .energy { margin: 10px 0; }
+        .status, .energy, .coins { margin: 10px 0; }
         button, input { margin: 5px; padding: 10px; }
     </style>
 </head>
@@ -19,9 +19,11 @@
     <div class="pet">🐶</div>
     <div class="status">Состояние: 😊</div>
     <div class="energy">Энергия: 100</div>
+    <div class="coins">Монеты: 50</div>
     <button onclick="feedPet()" id="feedButton">Кормить</button>
     <button onclick="playWithPet()" id="playButton">Играть</button>
     <button onclick="restPet()" id="restButton">Отдых</button>
+    <button onclick="buyFood()" id="buyFoodButton">Купить еду (10 монет)</button>
     <button onclick="revivePet()" id="reviveButton" style="display: none;">Возродить</button>
 
     <script>
@@ -30,9 +32,11 @@
         let petEnergy = parseInt(localStorage.getItem("petEnergy")) || 100;
         let deathTimer = parseInt(localStorage.getItem("deathTimer")) || 0;
         let isDead = localStorage.getItem("isDead") === "true";
+        let coins = parseInt(localStorage.getItem("coins")) || 50;
 
         const statusElement = document.querySelector(".status");
         const energyElement = document.querySelector(".energy");
+        const coinsElement = document.querySelector(".coins");
         const petNameTitle = document.getElementById("petNameTitle");
         const petNameInput = document.getElementById("petNameInput");
         const setNameButton = document.getElementById("setNameButton");
@@ -53,10 +57,12 @@
             }
             statusElement.innerText = "Состояние: " + petMood;
             energyElement.innerText = "Энергия: " + petEnergy;
+            coinsElement.innerText = "Монеты: " + coins;
             localStorage.setItem("petMood", petMood);
             localStorage.setItem("petEnergy", petEnergy);
             localStorage.setItem("deathTimer", deathTimer);
             localStorage.setItem("isDead", isDead);
+            localStorage.setItem("coins", coins);
         }
 
         function setPetName() {
@@ -101,6 +107,16 @@
             }
         }
 
+        function buyFood() {
+            if (coins >= 10) {
+                coins -= 10;
+                petEnergy = Math.min(petEnergy + 20, 100);
+                updateStatus();
+            } else {
+                alert("Недостаточно монет!");
+            }
+        }
+
         function revivePet() {
             petMood = "😊";
             petEnergy = 100;
@@ -142,6 +158,7 @@
     </script>
 </body>
 </html>
+
 
 
 
