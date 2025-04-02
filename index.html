@@ -9,6 +9,7 @@
         body { font-family: Arial, sans-serif; text-align: center; }
         .pet { font-size: 50px; }
         .status { margin: 10px 0; }
+        .energy { margin: 10px 0; }
         button { margin: 5px; padding: 10px; }
     </style>
 </head>
@@ -16,17 +17,22 @@
     <h1>Мой питомец</h1>
     <div class="pet">🐶</div>
     <div class="status">Состояние: 😊</div>
+    <div class="energy">Энергия: 100</div>
     <button onclick="feedPet()">Кормить</button>
     <button onclick="playWithPet()">Играть</button>
     <button onclick="restPet()">Отдых</button>
 
     <script>
         let petMood = localStorage.getItem("petMood") || "😊";
+        let petEnergy = parseInt(localStorage.getItem("petEnergy")) || 100;
         const statusElement = document.querySelector(".status");
+        const energyElement = document.querySelector(".energy");
 
         function updateStatus() {
             statusElement.innerText = "Состояние: " + petMood;
+            energyElement.innerText = "Энергия: " + petEnergy;
             localStorage.setItem("petMood", petMood);
+            localStorage.setItem("petEnergy", petEnergy);
         }
 
         function feedPet() {
@@ -35,12 +41,18 @@
         }
 
         function playWithPet() {
-            petMood = "😂";
+            if (petEnergy > 0) {
+                petMood = "😂";
+                petEnergy -= 20;
+            } else {
+                petMood = "😩"; // Уставший питомец
+            }
             updateStatus();
         }
 
         function restPet() {
             petMood = "😴";
+            petEnergy = Math.min(petEnergy + 30, 100);
             updateStatus();
         }
 
@@ -53,4 +65,5 @@
     </script>
 </body>
 </html>
+
 
