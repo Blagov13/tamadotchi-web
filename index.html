@@ -21,11 +21,12 @@
     <button onclick="restPet()">Отдых</button>
 
     <script>
-        let petMood = "😊";
+        let petMood = localStorage.getItem("petMood") || "😊";
         const statusElement = document.querySelector(".status");
 
         function updateStatus() {
             statusElement.innerText = "Состояние: " + petMood;
+            localStorage.setItem("petMood", petMood);
         }
 
         function feedPet() {
@@ -47,6 +48,8 @@
             petMood = "😢"; // Если долго не ухаживать, питомцу грустно
             updateStatus();
         }, 10000);
+
+        updateStatus(); // Устанавливаем сохраненное состояние при загрузке
     </script>
 </body>
 </html>
