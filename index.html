@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Tamagotchi</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <style>
+        body { font-family: Arial; text-align: center; }
+        #pet { font-size: 50px; margin: 20px; }
+    </style>
+</head>
+<body>
+    <h1>Ваш питомец</h1>
+    <div id="pet">🐣</div>
+    <button onclick="feed()">Покормить</button>
+
+    <script>
+        function feed() {
+            alert("Питомец накормлен!");
+            // Здесь позже добавим API-запрос
+        }
+    </script>
+</body>
+</html>
