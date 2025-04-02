@@ -18,61 +18,86 @@
     <div class="pet">🐶</div>
     <div class="status">Состояние: 😊</div>
     <div class="energy">Энергия: 100</div>
-    <button onclick="feedPet()">Кормить</button>
-    <button onclick="playWithPet()">Играть</button>
-    <button onclick="restPet()">Отдых</button>
+    <button onclick="feedPet()" id="feedButton">Кормить</button>
+    <button onclick="playWithPet()" id="playButton">Играть</button>
+    <button onclick="restPet()" id="restButton">Отдых</button>
 
     <script>
         let petMood = localStorage.getItem("petMood") || "😊";
         let petEnergy = parseInt(localStorage.getItem("petEnergy")) || 100;
+        let deathTimer = parseInt(localStorage.getItem("deathTimer")) || 0;
+        let isDead = localStorage.getItem("isDead") === "true";
         const statusElement = document.querySelector(".status");
         const energyElement = document.querySelector(".energy");
+        const buttons = document.querySelectorAll("button");
 
         function updateStatus() {
-            if (petEnergy < 30) {
+            if (isDead) {
+                petMood = "💀";
+                buttons.forEach(button => button.disabled = true);
+            } else if (petEnergy < 30) {
                 petMood = "😩"; // Уставший питомец
             }
             statusElement.innerText = "Состояние: " + petMood;
             energyElement.innerText = "Энергия: " + petEnergy;
             localStorage.setItem("petMood", petMood);
             localStorage.setItem("petEnergy", petEnergy);
+            localStorage.setItem("deathTimer", deathTimer);
+            localStorage.setItem("isDead", isDead);
         }
 
         function feedPet() {
-            petMood = "😋";
-            updateStatus();
+            if (!isDead) {
+                petMood = "😋";
+                deathTimer = 0;
+                updateStatus();
+            }
         }
 
         function playWithPet() {
-            if (petEnergy > 0) {
+            if (!isDead && petEnergy > 0) {
                 petMood = "😂";
                 petEnergy -= 20;
-            } else {
-                petMood = "😩"; // Уставший питомец
+                deathTimer = 0;
+            } else if (!isDead) {
+                petMood = "😩";
             }
             updateStatus();
         }
 
         function restPet() {
-            petMood = "😴";
-            petEnergy = Math.min(petEnergy + 30, 100);
-            updateStatus();
+            if (!isDead) {
+                petMood = "😴";
+                petEnergy = Math.min(petEnergy + 30, 100);
+                deathTimer = 0;
+                updateStatus();
+            }
         }
 
         setInterval(() => {
-            petEnergy = Math.max(petEnergy - 5, 0);
-            if (petEnergy === 0) {
-                petMood = "😭"; // Совсем уставший питомец
+            if (!isDead) {
+                petEnergy = Math.max(petEnergy - 5, 0);
+                if (petEnergy === 0) {
+                    petMood = "😭";
+                    deathTimer += 1;
+                }
+                if (deathTimer >= 3) { // Если питомец на нуле энергии слишком долго
+                    petMood = "💀";
+                    isDead = true;
+                    buttons.forEach(button => button.disabled = true);
+                }
+                updateStatus();
             }
-            updateStatus();
         }, 10000);
 
         setInterval(() => {
-            petMood = "😢"; // Если долго не ухаживать, питомцу грустно
-            updateStatus();
+            if (!isDead) {
+                petMood = "😢";
+                updateStatus();
+            }
         }, 15000);
 
-        updateStatus(); // Устанавливаем сохраненное состояние при загрузке
+        updateStatus();
     </script>
 </body>
 </html>
