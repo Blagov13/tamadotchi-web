@@ -3,130 +3,131 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tamagotchi MVP</title>
+    <title>Tamagotchi</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
         body { font-family: Arial, sans-serif; text-align: center; }
         .pet { font-size: 50px; }
-        .status, .energy, .hunger, .coins, .age { margin: 10px 0; }
+        .status, .energy, .hunger, .age, .hygiene, .happiness { margin: 10px 0; }
         button, input { margin: 5px; padding: 10px; }
     </style>
 </head>
 <body>
-    <h1 id="petNameTitle">Мой питомец</h1>
+    <h1 id="petNameTitle">Выберите питомца</h1>
+    <div id="petSelection">
+        <button onclick="selectPet('🐶')">🐶 Собака</button>
+        <button onclick="selectPet('🐱')">🐱 Кот</button>
+        <button onclick="selectPet('🐰')">🐰 Кролик</button>
+    </div>
     <input type="text" id="petNameInput" placeholder="Введите имя питомца" style="display: none;">
-    <button onclick="setPetName()" id="setNameButton">Установить имя</button>
-    <div class="pet" id="petEmoji">🐶</div>
+    <button onclick="setPetName()" id="setNameButton" style="display: none;">Установить имя</button>
+    <div class="pet" id="petEmoji" style="display: none;"></div>
     <div class="status">Состояние: 😊</div>
     <div class="age">Возраст: 0 дней</div>
     <div class="energy">Энергия: 100</div>
     <div class="hunger">Голод: 50</div>
-    <div class="coins">Монеты: 50</div>
-    <button onclick="feedPet()" id="feedButton">Кормить</button>
-    <button onclick="playWithPet()" id="playButton">Играть</button>
-    <button onclick="restPet()" id="restButton">Отдых</button>
-    <button onclick="buyFood()" id="buyFoodButton">Купить еду (10 монет)</button>
-    <button onclick="workPet()" id="workButton">Работать (5 монет, -10 энергии)</button>
-    <button onclick="revivePet()" id="reviveButton" style="display: none;">Возродить</button>
-    <button onclick="befriendPet()" id="befriendButton">Подружиться с питомцем</button>
-    <button onclick="giftCoins()" id="giftButton">Подарить 10 монет другу</button>
-    <button onclick="racePet()" id="raceButton">Участвовать в забеге</button>
-
+    <div class="hygiene">Гигиена: 100</div>
+    <div class="happiness">Счастье: 100</div>
+    <button onclick="feedPet()" id="feedButton" style="display: none;">Кормить</button>
+    <button onclick="playWithPet()" id="playButton" style="display: none;">Играть</button>
+    <button onclick="restPet()" id="restButton" style="display: none;">Отдых</button>
+    <button onclick="cleanPet()" id="cleanButton" style="display: none;">Чистить</button>
+    <button onclick="healPet()" id="healButton" style="display: none;">Лечить</button>
     <script>
         let petName = localStorage.getItem("petName") || "";
-        let petMood = localStorage.getItem("petMood") || "😊";
+        let petEmoji = localStorage.getItem("petEmoji") || "";
         let petEnergy = parseInt(localStorage.getItem("petEnergy")) || 100;
         let petHunger = parseInt(localStorage.getItem("petHunger")) || 50;
-        let isDead = localStorage.getItem("isDead") === "true";
-        let coins = parseInt(localStorage.getItem("coins")) || 50;
-        let petForm = localStorage.getItem("petForm") || "🐶";
+        let petHygiene = parseInt(localStorage.getItem("petHygiene")) || 100;
+        let petHappiness = parseInt(localStorage.getItem("petHappiness")) || 100;
         let petAge = parseInt(localStorage.getItem("petAge")) || 0;
-        let friends = JSON.parse(localStorage.getItem("friends")) || [];
 
-        const statusElement = document.querySelector(".status");
-        const energyElement = document.querySelector(".energy");
-        const hungerElement = document.querySelector(".hunger");
-        const coinsElement = document.querySelector(".coins");
-        const petEmoji = document.getElementById("petEmoji");
-        const ageElement = document.querySelector(".age");
+        function selectPet(emoji) {
+            petEmoji = emoji;
+            localStorage.setItem("petEmoji", petEmoji);
+            document.getElementById("petSelection").style.display = "none";
+            document.getElementById("petNameInput").style.display = "block";
+            document.getElementById("setNameButton").style.display = "block";
+        }
+
+        function setPetName() {
+            let input = document.getElementById("petNameInput").value.trim();
+            if (input) {
+                petName = input;
+                localStorage.setItem("petName", petName);
+                document.getElementById("petNameTitle").innerText = petName;
+                document.getElementById("petNameInput").style.display = "none";
+                document.getElementById("setNameButton").style.display = "none";
+                document.getElementById("petEmoji").innerText = petEmoji;
+                document.getElementById("petEmoji").style.display = "block";
+                document.querySelectorAll("button").forEach(btn => btn.style.display = "inline-block");
+                updateStatus();
+            }
+        }
 
         function updateStatus() {
-            if (isDead) {
-                petMood = "💀";
-            } else {
-                if (petEnergy < 30 || petHunger >= 80) {
-                    petMood = "😩";
-                }
-            }
-            statusElement.innerText = "Состояние: " + petMood;
-            energyElement.innerText = "Энергия: " + petEnergy;
-            hungerElement.innerText = "Голод: " + petHunger;
-            coinsElement.innerText = "Монеты: " + coins;
-            petEmoji.innerText = petForm;
-            ageElement.innerText = "Возраст: " + petAge + " дней";
-            localStorage.setItem("petMood", petMood);
+            document.querySelector(".energy").innerText = "Энергия: " + petEnergy;
+            document.querySelector(".hunger").innerText = "Голод: " + petHunger;
+            document.querySelector(".hygiene").innerText = "Гигиена: " + petHygiene;
+            document.querySelector(".happiness").innerText = "Счастье: " + petHappiness;
+            document.querySelector(".age").innerText = "Возраст: " + petAge + " дней";
             localStorage.setItem("petEnergy", petEnergy);
             localStorage.setItem("petHunger", petHunger);
-            localStorage.setItem("isDead", isDead);
-            localStorage.setItem("coins", coins);
-            localStorage.setItem("petForm", petForm);
+            localStorage.setItem("petHygiene", petHygiene);
+            localStorage.setItem("petHappiness", petHappiness);
             localStorage.setItem("petAge", petAge);
-            localStorage.setItem("friends", JSON.stringify(friends));
         }
 
         function feedPet() {
-            if (coins >= 5) {
-                petHunger = Math.max(0, petHunger - 20);
-                coins -= 5;
-                updateStatus();
-            }
+            petHunger = Math.max(0, petHunger - 20);
+            petHygiene -= 10;
+            updateStatus();
         }
 
         function playWithPet() {
             if (petEnergy >= 10) {
                 petEnergy -= 10;
                 petHunger += 10;
+                petHappiness += 10;
                 updateStatus();
             }
         }
 
         function restPet() {
             petEnergy = Math.min(100, petEnergy + 20);
+            petHappiness -= 5;
             updateStatus();
         }
 
-        function buyFood() {
-            if (coins >= 10) {
-                coins -= 10;
-                petHunger = Math.max(0, petHunger - 30);
-                updateStatus();
-            }
+        function cleanPet() {
+            petHygiene = 100;
+            updateStatus();
         }
 
-        function workPet() {
-            if (petEnergy >= 10) {
-                petEnergy -= 10;
-                coins += 5;
-                updateStatus();
+        function healPet() {
+            if (petHygiene < 50 || petHunger > 80) {
+                petHappiness -= 10;
             }
+            updateStatus();
         }
 
         function agePet() {
-            if (!isDead) {
-                petAge++;
-                if (petAge === 3) {
-                    petForm = "🐱";
-                } else if (petAge === 6) {
-                    petForm = "🦊";
-                } else if (petAge === 10) {
-                    petForm = "🐲";
-                }
-                updateStatus();
-            }
+            petAge++;
+            updateStatus();
         }
 
-        setInterval(agePet, 30000); // Питомец стареет каждые 30 секунд
-        updateStatus();
+        if (petName && petEmoji) {
+            document.getElementById("petNameTitle").innerText = petName;
+            document.getElementById("petSelection").style.display = "none";
+            document.getElementById("petNameInput").style.display = "none";
+            document.getElementById("setNameButton").style.display = "none";
+            document.getElementById("petEmoji").innerText = petEmoji;
+            document.querySelectorAll("button").forEach(btn => btn.style.display = "inline-block");
+            updateStatus();
+        }
+
+        setInterval(agePet, 60000);
     </script>
 </body>
 </html>
+
