@@ -29,6 +29,7 @@
     <button onclick="revivePet()" id="reviveButton" style="display: none;">Возродить</button>
     <button onclick="befriendPet()" id="befriendButton">Подружиться с питомцем</button>
     <button onclick="giftCoins()" id="giftButton">Подарить 10 монет другу</button>
+    <button onclick="racePet()" id="raceButton">Участвовать в забеге</button>
 
     <script>
         let petName = localStorage.getItem("petName") || "";
@@ -89,6 +90,23 @@
             } else {
                 alert("У вас недостаточно монет или нет друзей!");
             }
+        }
+
+        function racePet() {
+            if (petEnergy < 20) {
+                alert("Ваш питомец слишком устал для участия в забеге!");
+                return;
+            }
+            let raceResult = Math.random() > 0.5;
+            if (raceResult) {
+                coins += 20;
+                petEnergy -= 10;
+                alert("Поздравляем! Ваш питомец выиграл забег и получил 20 монет!");
+            } else {
+                petEnergy -= 15;
+                alert("Увы, ваш питомец проиграл забег. Попробуйте снова!");
+            }
+            updateStatus();
         }
 
         updateStatus();
