@@ -14,10 +14,14 @@
     <button onclick="feed()">Покормить</button>
 
     <script>
-        function feed() {
-            alert("Питомец накормлен!");
-            // Здесь позже добавим API-запрос
-        }
+        async function feed() {
+    const response = await fetch('http://localhost:3000/feed', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+    });
+    const result = await response.json();
+    alert(result.message);
+}
     </script>
 </body>
 </html>
