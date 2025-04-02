@@ -8,13 +8,14 @@
     <style>
         body { font-family: Arial, sans-serif; text-align: center; }
         .pet { font-size: 50px; }
-        .status { margin: 10px 0; }
-        .energy { margin: 10px 0; }
-        button { margin: 5px; padding: 10px; }
+        .status, .energy { margin: 10px 0; }
+        button, input { margin: 5px; padding: 10px; }
     </style>
 </head>
 <body>
-    <h1>Мой питомец</h1>
+    <h1 id="petNameTitle">Мой питомец</h1>
+    <input type="text" id="petNameInput" placeholder="Введите имя питомца" style="display: none;">
+    <button onclick="setPetName()" id="setNameButton">Установить имя</button>
     <div class="pet">🐶</div>
     <div class="status">Состояние: 😊</div>
     <div class="energy">Энергия: 100</div>
@@ -24,13 +25,18 @@
     <button onclick="revivePet()" id="reviveButton" style="display: none;">Возродить</button>
 
     <script>
+        let petName = localStorage.getItem("petName") || "";
         let petMood = localStorage.getItem("petMood") || "😊";
         let petEnergy = parseInt(localStorage.getItem("petEnergy")) || 100;
         let deathTimer = parseInt(localStorage.getItem("deathTimer")) || 0;
         let isDead = localStorage.getItem("isDead") === "true";
+
         const statusElement = document.querySelector(".status");
         const energyElement = document.querySelector(".energy");
-        const buttons = document.querySelectorAll("button:not(#reviveButton)");
+        const petNameTitle = document.getElementById("petNameTitle");
+        const petNameInput = document.getElementById("petNameInput");
+        const setNameButton = document.getElementById("setNameButton");
+        const buttons = document.querySelectorAll("button:not(#reviveButton, #setNameButton)");
         const reviveButton = document.getElementById("reviveButton");
 
         function updateStatus() {
@@ -51,6 +57,20 @@
             localStorage.setItem("petEnergy", petEnergy);
             localStorage.setItem("deathTimer", deathTimer);
             localStorage.setItem("isDead", isDead);
+        }
+
+        function setPetName() {
+            if (petNameInput.style.display === "none") {
+                petNameInput.style.display = "inline";
+                petNameInput.value = petName;
+                setNameButton.innerText = "Сохранить имя";
+            } else {
+                petName = petNameInput.value.trim() || "Безымянный";
+                localStorage.setItem("petName", petName);
+                petNameTitle.innerText = petName;
+                petNameInput.style.display = "none";
+                setNameButton.innerText = "Изменить имя";
+            }
         }
 
         function feedPet() {
@@ -112,6 +132,11 @@
                 updateStatus();
             }
         }, 15000);
+
+        if (petName) {
+            petNameTitle.innerText = petName;
+            setNameButton.innerText = "Изменить имя";
+        }
 
         updateStatus();
     </script>
