@@ -21,6 +21,7 @@
     <button onclick="feedPet()" id="feedButton">Кормить</button>
     <button onclick="playWithPet()" id="playButton">Играть</button>
     <button onclick="restPet()" id="restButton">Отдых</button>
+    <button onclick="revivePet()" id="reviveButton" style="display: none;">Возродить</button>
 
     <script>
         let petMood = localStorage.getItem("petMood") || "😊";
@@ -29,14 +30,20 @@
         let isDead = localStorage.getItem("isDead") === "true";
         const statusElement = document.querySelector(".status");
         const energyElement = document.querySelector(".energy");
-        const buttons = document.querySelectorAll("button");
+        const buttons = document.querySelectorAll("button:not(#reviveButton)");
+        const reviveButton = document.getElementById("reviveButton");
 
         function updateStatus() {
             if (isDead) {
                 petMood = "💀";
                 buttons.forEach(button => button.disabled = true);
-            } else if (petEnergy < 30) {
-                petMood = "😩"; // Уставший питомец
+                reviveButton.style.display = "block";
+            } else {
+                reviveButton.style.display = "none";
+                buttons.forEach(button => button.disabled = false);
+                if (petEnergy < 30) {
+                    petMood = "😩"; // Уставший питомец
+                }
             }
             statusElement.innerText = "Состояние: " + petMood;
             energyElement.innerText = "Энергия: " + petEnergy;
@@ -74,6 +81,14 @@
             }
         }
 
+        function revivePet() {
+            petMood = "😊";
+            petEnergy = 100;
+            isDead = false;
+            deathTimer = 0;
+            updateStatus();
+        }
+
         setInterval(() => {
             if (!isDead) {
                 petEnergy = Math.max(petEnergy - 5, 0);
@@ -85,6 +100,7 @@
                     petMood = "💀";
                     isDead = true;
                     buttons.forEach(button => button.disabled = true);
+                    reviveButton.style.display = "block";
                 }
                 updateStatus();
             }
@@ -101,5 +117,6 @@
     </script>
 </body>
 </html>
+
 
 
