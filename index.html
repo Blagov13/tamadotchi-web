@@ -37,7 +37,6 @@
         let petMood = localStorage.getItem("petMood") || "😊";
         let petEnergy = parseInt(localStorage.getItem("petEnergy")) || 100;
         let petHunger = parseInt(localStorage.getItem("petHunger")) || 50;
-        let deathTimer = parseInt(localStorage.getItem("deathTimer")) || 0;
         let isDead = localStorage.getItem("isDead") === "true";
         let coins = parseInt(localStorage.getItem("coins")) || 50;
         let petForm = localStorage.getItem("petForm") || "🐶";
@@ -68,7 +67,6 @@
             localStorage.setItem("petMood", petMood);
             localStorage.setItem("petEnergy", petEnergy);
             localStorage.setItem("petHunger", petHunger);
-            localStorage.setItem("deathTimer", deathTimer);
             localStorage.setItem("isDead", isDead);
             localStorage.setItem("coins", coins);
             localStorage.setItem("petForm", petForm);
