@@ -76,6 +76,43 @@
             localStorage.setItem("friends", JSON.stringify(friends));
         }
 
+        function feedPet() {
+            if (coins >= 5) {
+                petHunger = Math.max(0, petHunger - 20);
+                coins -= 5;
+                updateStatus();
+            }
+        }
+
+        function playWithPet() {
+            if (petEnergy >= 10) {
+                petEnergy -= 10;
+                petHunger += 10;
+                updateStatus();
+            }
+        }
+
+        function restPet() {
+            petEnergy = Math.min(100, petEnergy + 20);
+            updateStatus();
+        }
+
+        function buyFood() {
+            if (coins >= 10) {
+                coins -= 10;
+                petHunger = Math.max(0, petHunger - 30);
+                updateStatus();
+            }
+        }
+
+        function workPet() {
+            if (petEnergy >= 10) {
+                petEnergy -= 10;
+                coins += 5;
+                updateStatus();
+            }
+        }
+
         function agePet() {
             if (!isDead) {
                 petAge++;
@@ -91,7 +128,6 @@
         }
 
         setInterval(agePet, 30000); // Питомец стареет каждые 30 секунд
-
         updateStatus();
     </script>
 </body>
