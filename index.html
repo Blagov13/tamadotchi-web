@@ -14,13 +14,16 @@
     <button onclick="feed()">Покормить</button>
 
     <script>
-        async function feed() {
-    const response = await fetch('http://localhost:3000/feed', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-    });
-    const result = await response.json();
-    alert(result.message);
+        function feed() {
+    if (window.Telegram.WebApp) {
+        fetch('http://localhost:3000/feed', {
+            method: 'POST'
+        })
+        .then(response => response.json())
+        .then(data => {
+            Telegram.WebApp.showAlert(data.message);
+        });
+    }
 }
     </script>
 </body>
