@@ -8,7 +8,7 @@
     <style>
         body { font-family: Arial, sans-serif; text-align: center; }
         .pet { font-size: 50px; }
-        .status, .energy, .hunger, .coins { margin: 10px 0; }
+        .status, .energy, .hunger, .coins, .age { margin: 10px 0; }
         button, input { margin: 5px; padding: 10px; }
     </style>
 </head>
@@ -18,6 +18,7 @@
     <button onclick="setPetName()" id="setNameButton">Установить имя</button>
     <div class="pet" id="petEmoji">🐶</div>
     <div class="status">Состояние: 😊</div>
+    <div class="age">Возраст: 0 дней</div>
     <div class="energy">Энергия: 100</div>
     <div class="hunger">Голод: 50</div>
     <div class="coins">Монеты: 50</div>
@@ -40,7 +41,7 @@
         let isDead = localStorage.getItem("isDead") === "true";
         let coins = parseInt(localStorage.getItem("coins")) || 50;
         let petForm = localStorage.getItem("petForm") || "🐶";
-        let evolutionTimer = parseInt(localStorage.getItem("evolutionTimer")) || 0;
+        let petAge = parseInt(localStorage.getItem("petAge")) || 0;
         let friends = JSON.parse(localStorage.getItem("friends")) || [];
 
         const statusElement = document.querySelector(".status");
@@ -48,6 +49,7 @@
         const hungerElement = document.querySelector(".hunger");
         const coinsElement = document.querySelector(".coins");
         const petEmoji = document.getElementById("petEmoji");
+        const ageElement = document.querySelector(".age");
 
         function updateStatus() {
             if (isDead) {
@@ -62,6 +64,7 @@
             hungerElement.innerText = "Голод: " + petHunger;
             coinsElement.innerText = "Монеты: " + coins;
             petEmoji.innerText = petForm;
+            ageElement.innerText = "Возраст: " + petAge + " дней";
             localStorage.setItem("petMood", petMood);
             localStorage.setItem("petEnergy", petEnergy);
             localStorage.setItem("petHunger", petHunger);
@@ -69,49 +72,27 @@
             localStorage.setItem("isDead", isDead);
             localStorage.setItem("coins", coins);
             localStorage.setItem("petForm", petForm);
-            localStorage.setItem("evolutionTimer", evolutionTimer);
+            localStorage.setItem("petAge", petAge);
             localStorage.setItem("friends", JSON.stringify(friends));
         }
 
-        function befriendPet() {
-            let friendName = prompt("Введите имя питомца друга:");
-            if (friendName && !friends.includes(friendName)) {
-                friends.push(friendName);
-                alert(`Теперь вы друзья с ${friendName}!`);
+        function agePet() {
+            if (!isDead) {
+                petAge++;
+                if (petAge === 3) {
+                    petForm = "🐱";
+                } else if (petAge === 6) {
+                    petForm = "🦊";
+                } else if (petAge === 10) {
+                    petForm = "🐲";
+                }
                 updateStatus();
             }
         }
 
-        function giftCoins() {
-            if (coins >= 10 && friends.length > 0) {
-                coins -= 10;
-                alert("Вы подарили 10 монет одному из друзей!");
-                updateStatus();
-            } else {
-                alert("У вас недостаточно монет или нет друзей!");
-            }
-        }
-
-        function racePet() {
-            if (petEnergy < 20) {
-                alert("Ваш питомец слишком устал для участия в забеге!");
-                return;
-            }
-            let raceResult = Math.random() > 0.5;
-            if (raceResult) {
-                coins += 20;
-                petEnergy -= 10;
-                alert("Поздравляем! Ваш питомец выиграл забег и получил 20 монет!");
-            } else {
-                petEnergy -= 15;
-                alert("Увы, ваш питомец проиграл забег. Попробуйте снова!");
-            }
-            updateStatus();
-        }
+        setInterval(agePet, 30000); // Питомец стареет каждые 30 секунд
 
         updateStatus();
     </script>
 </body>
 </html>
-
-
