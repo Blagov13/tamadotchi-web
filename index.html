@@ -16,7 +16,7 @@
     <h1 id="petNameTitle">Мой питомец</h1>
     <input type="text" id="petNameInput" placeholder="Введите имя питомца" style="display: none;">
     <button onclick="setPetName()" id="setNameButton">Установить имя</button>
-    <div class="pet">🐶</div>
+    <div class="pet" id="petEmoji">🐶</div>
     <div class="status">Состояние: 😊</div>
     <div class="energy">Энергия: 100</div>
     <div class="hunger">Голод: 50</div>
@@ -36,6 +36,8 @@
         let deathTimer = parseInt(localStorage.getItem("deathTimer")) || 0;
         let isDead = localStorage.getItem("isDead") === "true";
         let coins = parseInt(localStorage.getItem("coins")) || 50;
+        let petForm = localStorage.getItem("petForm") || "🐶";
+        let evolutionTimer = parseInt(localStorage.getItem("evolutionTimer")) || 0;
 
         const statusElement = document.querySelector(".status");
         const energyElement = document.querySelector(".energy");
@@ -46,6 +48,7 @@
         const setNameButton = document.getElementById("setNameButton");
         const buttons = document.querySelectorAll("button:not(#reviveButton, #setNameButton)");
         const reviveButton = document.getElementById("reviveButton");
+        const petEmoji = document.getElementById("petEmoji");
 
         function updateStatus() {
             if (isDead) {
@@ -63,79 +66,34 @@
             energyElement.innerText = "Энергия: " + petEnergy;
             hungerElement.innerText = "Голод: " + petHunger;
             coinsElement.innerText = "Монеты: " + coins;
+            petEmoji.innerText = petForm;
             localStorage.setItem("petMood", petMood);
             localStorage.setItem("petEnergy", petEnergy);
             localStorage.setItem("petHunger", petHunger);
             localStorage.setItem("deathTimer", deathTimer);
             localStorage.setItem("isDead", isDead);
             localStorage.setItem("coins", coins);
+            localStorage.setItem("petForm", petForm);
+            localStorage.setItem("evolutionTimer", evolutionTimer);
         }
 
-        function feedPet() {
-            if (!isDead) {
-                petMood = "😋";
-                petHunger = Math.max(petHunger - 20, 0);
-                deathTimer = 0;
-                updateStatus();
-            }
-        }
-
-        function playWithPet() {
-            if (!isDead && petEnergy > 0) {
-                petMood = "😂";
-                petEnergy -= 20;
-                petHunger += 10;
-                deathTimer = 0;
-            } else if (!isDead) {
-                petMood = "😩";
-            }
-            updateStatus();
-        }
-
-        function restPet() {
-            if (!isDead) {
-                petMood = "😴";
-                petEnergy = Math.min(petEnergy + 30, 100);
-                deathTimer = 0;
-                updateStatus();
-            }
-        }
-
-        function buyFood() {
-            if (coins >= 10) {
-                coins -= 10;
-                feedPet();
-                updateStatus();
+        function checkEvolution() {
+            if (petEnergy > 80 && petHunger < 30 && !isDead) {
+                evolutionTimer += 1;
+                if (evolutionTimer >= 30) {
+                    petForm = "🐺";
+                    evolutionTimer = 0;
+                }
             } else {
-                alert("Недостаточно монет!");
+                evolutionTimer = 0;
             }
-        }
-
-        function workPet() {
-            if (!isDead && petEnergy >= 10) {
-                coins += 5;
-                petEnergy -= 10;
-                petHunger += 5;
-                petMood = "💼";
-                updateStatus();
-            } else {
-                alert("Питомец слишком уставший для работы!");
-            }
-        }
-
-        function revivePet() {
-            petMood = "😊";
-            petEnergy = 100;
-            petHunger = 50;
-            isDead = false;
-            deathTimer = 0;
-            updateStatus();
         }
 
         setInterval(() => {
             if (!isDead) {
                 petEnergy = Math.max(petEnergy - 5, 0);
                 petHunger = Math.min(petHunger + 5, 100);
+                checkEvolution();
                 if (petEnergy === 0 || petHunger >= 100) {
                     petMood = "😭";
                     deathTimer += 1;
@@ -150,15 +108,11 @@
             }
         }, 10000);
 
-        if (petName) {
-            petNameTitle.innerText = petName;
-            setNameButton.innerText = "Изменить имя";
-        }
-
         updateStatus();
     </script>
 </body>
 </html>
+
 
 
 
