@@ -6,10 +6,14 @@
     <title>Tamagotchi</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
+        @font-face {
+            font-family: 'PixelFont';
+            src: url('fonts/pixel_font.ttf');
+        }
         body {
-            font-family: Arial, sans-serif;
+            font-family: 'PixelFont', sans-serif;
             text-align: center;
-            background: linear-gradient(135deg, #ff9a9e, #fad0c4);
+            background: url('images/pixel_background.png');
             color: #fff;
             margin: 0;
             padding: 0;
@@ -20,41 +24,48 @@
             height: 100vh;
         }
         .container {
-            background: rgba(0, 0, 0, 0.3);
+            background: rgba(0, 0, 0, 0.6);
             padding: 20px;
-            border-radius: 15px;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
             width: 90%;
             max-width: 400px;
-        }
-        .pet {
-            margin: 20px 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
         }
         .pet img {
-            width: 150px;
+            width: 120px;
             height: auto;
+            image-rendering: pixelated;
         }
-        button {
-            margin: 5px;
-            padding: 10px 20px;
+        .buttons {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 5px;
+            margin: 10px 0;
+        }
+        .buttons button {
+            padding: 8px;
             border: none;
-            border-radius: 8px;
-            font-size: 16px;
+            border-radius: 4px;
+            font-size: 14px;
             cursor: pointer;
-            transition: 0.3s;
-            background: #ff758c;
+            background: #c86b85;
             color: white;
-            box-shadow: 0 3px 6px rgba(0, 0, 0, 0.2);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+            font-family: 'PixelFont', sans-serif;
         }
-        button:hover {
-            background: #ff4858;
+        .buttons button:hover {
+            background: #a0536c;
         }
         .status {
-            font-size: 18px;
+            font-size: 14px;
             margin-top: 10px;
         }
         .age {
-            font-size: 16px;
+            font-size: 12px;
             margin-top: 5px;
         }
     </style>
@@ -69,19 +80,30 @@
         </div>
         <input type="text" id="petNameInput" placeholder="Введите имя питомца" style="display: none;">
         <button onclick="setPetName()" id="setNameButton" style="display: none;">Установить имя</button>
+        <div class="buttons" id="topButtons" style="display: none;">
+            <button onclick="feedPet()">🍖</button>
+            <button onclick="restPet()">🛌</button>
+            <button onclick="playWithPet()">🎾</button>
+            <button onclick="healPet()">💊</button>
+        </div>
         <div class="pet" id="petImage" style="display: none;"></div>
         <div class="status" id="petStatus">Состояние: 😊</div>
         <div class="age">Возраст: 0 дней</div>
-        <button onclick="feedPet()" id="feedButton" style="display: none;">Кормить</button>
-        <button onclick="playWithPet()" id="playButton" style="display: none;">Играть</button>
-        <button onclick="restPet()" id="restButton" style="display: none;">Отдых</button>
-        <button onclick="cleanPet()" id="cleanButton" style="display: none;">Чистить</button>
+        <div class="buttons" id="bottomButtons" style="display: none;">
+            <button onclick="cleanPet()">🛁</button>
+            <button onclick="weighPet()">⚖️</button>
+            <button onclick="singToPet()">🎤</button>
+            <button onclick="tidyUp()">🧹</button>
+        </div>
     </div>
     <script>
         let petName = localStorage.getItem("petName") || "";
         let petType = localStorage.getItem("petType") || "";
         let petAge = 0;
-        let petHealth = 100;
+        let hunger = 50;
+        let happiness = 50;
+        let health = 50;
+        let energy = 50;
 
         function selectPet(type) {
             petType = type;
@@ -101,33 +123,36 @@
                 document.getElementById("setNameButton").style.display = "none";
                 updatePetImage();
                 document.getElementById("petImage").style.display = "block";
-                document.getElementById("feedButton").style.display = "inline-block";
-                document.getElementById("playButton").style.display = "inline-block";
-                document.getElementById("restButton").style.display = "inline-block";
-                document.getElementById("cleanButton").style.display = "inline-block";
+                document.getElementById("topButtons").style.display = "flex";
+                document.getElementById("bottomButtons").style.display = "flex";
                 updateStatus();
             }
         }
 
         function updatePetImage() {
             let petImageDiv = document.getElementById("petImage");
-            petImageDiv.innerHTML = `<img src="images/${petType}.png" alt="${petType}">`;
+            petImageDiv.innerHTML = `<img src="images/${petType}_pixel.png" alt="${petType}">`;
         }
 
         function updateStatus() {
             let status = "😊 Счастлив";
+            if (hunger > 70) status = "😋 Голоден";
+            if (happiness < 30) status = "😢 Грустный";
+            if (energy < 30) status = "😴 Устал";
+            if (health < 30) status = "🤒 Болен";
             document.getElementById("petStatus").innerText = "Состояние: " + status;
-            document.querySelector(".age").innerText = "Возраст: " + petAge + " дней";
         }
 
-        setInterval(() => {
-            if (petHealth > 0) {
-                petAge++;
-                updateStatus();
-            }
-        }, 60000);
+        function feedPet() { hunger -= 20; updateStatus(); }
+        function restPet() { energy += 20; updateStatus(); }
+        function playWithPet() { happiness += 20; updateStatus(); }
+        function healPet() { health += 20; updateStatus(); }
+        function cleanPet() { happiness += 10; updateStatus(); }
+
+        setInterval(() => { hunger += 5; energy -= 5; happiness -= 5; health -= 2; updateStatus(); }, 60000);
     </script>
 </body>
 </html>
+
 
 
